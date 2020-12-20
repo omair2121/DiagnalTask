@@ -34,24 +34,10 @@ class MoviePagingSource constructor(
 
     }
 
-//    class SweetSearchDataSourceFactory() :
-//        DataSource.Factory<Int, MovieModel>() {
-//
-//        var query = ""
-//
-//        override fun create(): DataSource<Int, MovieModel> {
-//            return dao.searchSweets(query).map { /*MovieModel()*/ }.create()
-//        }
-//
-//        fun search(text: String) {
-//            query = text
-//        }
-//    }
 
     private fun getDataFromAsset(no: Int): MovieModel? {
         var json: String? = null
         json = try {
-            Log.d("My", "getPageData: loading page $no")
             val `is`: InputStream = context.assets.open("page$no.json")
             val size: Int = `is`.available()
             val buffer = ByteArray(size)

@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MovieFragment : Fragment(R.layout.fragment_home) {
+class MovieFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener {
 
     private val viewModel by viewModels<MovieViewModel>()
 
@@ -33,14 +33,18 @@ class MovieFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
+        initRecycler()
+        setHasOptionsMenu(true)
+        observers()
+    }
+
+    private fun initRecycler() {
         grid = GridLayoutManager(requireActivity(), if (isPortraitMode()) 3 else 7)
         binding.apply {
             recycler.setHasFixedSize(true)
             recycler.layoutManager = grid
             recycler.adapter = adapter
         }
-        setHasOptionsMenu(true)
-        observers()
     }
 
     private fun observers() {
@@ -54,29 +58,30 @@ class MovieFragment : Fragment(R.layout.fragment_home) {
         context?.resources?.configuration?.orientation == Configuration.ORIENTATION_PORTRAIT
 
 
+    private fun search(query: String?) {
+        if (query != null && query.length > 3)
+            viewModel.fetchPageData(query)
+        else if (query == null || query.isEmpty())
+            viewModel.fetchPageData("1")
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        search(query)
+        return true
+    }
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        search(query)
+        return false
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         val searchItem: MenuItem? = menu.findItem(R.id.action_settings)
         val searchManager = context?.getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchView: SearchView = searchItem?.actionView as SearchView
         searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null && query.length > 3)
-                    viewModel.fetchPageData(query)
-                else if (query == null || query.isEmpty())
-                    viewModel.fetchPageData("1")
-                return true
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                if (query != null && query.length > 3)
-                    viewModel.fetchPageData(query)
-                else if (query == null || query.isEmpty())
-                    viewModel.fetchPageData("1")
-                return false
-            }
-        })
+        searchView.setOnQueryTextListener(this)
     }
 
     override fun onDestroyView() {
