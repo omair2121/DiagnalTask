@@ -11,7 +11,7 @@ import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 
-@InstallIn(ActivityComponent::class)
+@InstallIn(ApplicationComponent::class)
 @Module
 object ActivityModule {
     @Provides
@@ -20,6 +20,6 @@ object ActivityModule {
     }
 
     @Provides
-    fun provideAdapter(@ActivityContext context: Context) = MovieAdapter(context)
+    fun provideAdapter(context: Context) = MovieAdapter(context)
 
 }
