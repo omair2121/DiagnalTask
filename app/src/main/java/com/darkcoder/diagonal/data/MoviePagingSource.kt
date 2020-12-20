@@ -2,6 +2,7 @@ package com.darkcoder.diagonal.data
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.core.text.isDigitsOnly
 import androidx.paging.DataSource
 import androidx.paging.PagingSource
@@ -22,6 +23,8 @@ class MoviePagingSource constructor(
             var filtered: List<Content>? = null
             if (!query.isDigitsOnly()) {
                 filtered = movies.filter { it.name.contains(query, true) }
+                if(filtered.isEmpty())
+                Toast.makeText(context, "No Result found for $query", Toast.LENGTH_SHORT).show()
             }
             LoadResult.Page(
                 data = if (!query.isDigitsOnly()) filtered!! else movies,
